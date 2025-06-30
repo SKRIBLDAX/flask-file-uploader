@@ -2,17 +2,37 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Загруженные файлы</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   </head>
-  <body>
-    <h1>Загруженные файлы</h1>
-    <ul>
-      {% for file in files %}
-        <li>
-          <a href="{{ url_for('uploaded_file', filename=file) }}">{{ file }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-    <a href="{{ url_for('upload_file') }}">Назад к загрузке</a>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h1 class="card-title mb-4 text-center">Загруженные файлы</h1>
+              {% if files %}
+                <ul class="list-group">
+                  {% for file in files %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ file }}</span>
+                      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('uploaded_file', filename=file) }}" download>Скачать</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <div class="alert alert-warning text-center">Нет загруженных файлов</div>
+              {% endif %}
+              <div class="mt-3 text-center">
+                <a href="{{ url_for('upload_file') }}">Назад к загрузке</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html> 
