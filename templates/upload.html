@@ -171,12 +171,12 @@
           document.documentElement.setAttribute('data-theme', 'dark');
           localStorage.setItem('theme', 'dark');
           document.getElementById('themeSwitch').checked = true;
-          document.getElementById('themeSwitchLabel').textContent = 'Светлая тема';
+          document.getElementById('themeSwitchLabel').textContent = 'светлый тёма';
         } else {
           document.documentElement.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
           document.getElementById('themeSwitch').checked = false;
-          document.getElementById('themeSwitchLabel').textContent = 'Тёмная тема';
+          document.getElementById('themeSwitchLabel').textContent = 'тёмный тёма';
         }
       }
       document.getElementById('themeSwitch').addEventListener('change', function() {
