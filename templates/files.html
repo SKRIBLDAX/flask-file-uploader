@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Загруженные файлы</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
       body { background: #f8f6ff; }
       .card { border: none; border-radius: 1.5rem; }
@@ -21,6 +22,19 @@
         background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 100%);
         color: #fff;
       }
+      .btn-delete {
+        background: #fff;
+        color: #7c3aed;
+        border: 1px solid #a78bfa;
+        border-radius: 2rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        transition: background 0.2s, color 0.2s;
+      }
+      .btn-delete:hover {
+        background: #f3e8ff;
+        color: #4c1d95;
+      }
       .card-title {
         color: #7c3aed;
         font-weight: 700;
@@ -28,9 +42,33 @@
       a { color: #7c3aed; }
       a:hover { color: #4c1d95; }
       .list-group-item { border: none; border-radius: 1rem; margin-bottom: 0.5rem; }
+      .user-menu {
+        position: absolute;
+        top: 24px;
+        right: 40px;
+      }
+      .dropdown-menu {
+        min-width: 160px;
+      }
     </style>
   </head>
   <body>
+    <!-- Шапка с иконкой пользователя -->
+    <nav class="navbar navbar-light bg-transparent">
+      <div class="container-fluid">
+        <span></span>
+        <div class="user-menu dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user-circle fa-2x" style="color:#7c3aed;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('uploaded_files') }}">Мои файлы</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
     <div class="container py-5">
       <div class="row justify-content-center">
         <div class="col-md-8">
@@ -42,7 +80,14 @@
                   {% for file in files %}
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-white">
                       <span>{{ file }}</span>
-                      <a class="btn btn-sm btn-purple" href="{{ url_for('uploaded_file', filename=file) }}" download>Скачать</a>
+                      <div>
+                        <a class="btn btn-sm btn-purple" href="{{ url_for('uploaded_file', filename=file) }}" download>Скачать</a>
+                        {% if is_admin %}
+                        <form method="post" action="{{ url_for('delete_file', filename=file) }}" style="display:inline;">
+                          <button type="submit" class="btn btn-sm btn-delete">Удалить</button>
+                        </form>
+                        {% endif %}
+                      </div>
                     </li>
                   {% endfor %}
                 </ul>
