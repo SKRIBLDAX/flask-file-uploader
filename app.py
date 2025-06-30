@@ -16,6 +16,10 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'supersecretkey'
 
+# ВРЕМЕННО: удаляем users.json при запуске, чтобы сбросить пользователей на сервере Render
+if os.path.exists('users.json'):
+    os.remove('users.json')
+
 def load_users():
     if not os.path.exists(USERS_FILE):
         return {}
@@ -64,7 +68,7 @@ def register():
         elif not username or not password:
             flash('Заполните все поля!')
         else:
-            users[username] = password
+            users[username] = {"password": password}
             save_users(users)
             flash('Регистрация успешна! Теперь войдите.')
             return redirect(url_for('login'))
@@ -80,7 +84,7 @@ def login():
             session['username'] = username
             flash('Вы вошли как администратор!')
             return redirect(url_for('upload_file'))
-        elif username in users and users[username] == password:
+        elif username in users and users[username].get('password') == password:
             session['username'] = username
             flash('Вы успешно вошли!')
             return redirect(url_for('upload_file'))
@@ -185,7 +189,7 @@ def profile():
             if username == ADMIN_USERNAME:
                 correct_old = old_password == admin_password
             else:
-                correct_old = user.get('password') == old_password or users[username] == old_password
+                correct_old = user.get('password') == old_password
             if not correct_old:
                 flash('Старый пароль неверен!')
             elif new_password != confirm_password:
