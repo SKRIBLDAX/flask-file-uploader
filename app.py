@@ -183,7 +183,6 @@ def profile():
         confirm_password = request.form.get('confirm_password')
         if old_password and new_password and confirm_password:
             if username == ADMIN_USERNAME:
-                global ADMIN_PASSWORD
                 correct_old = old_password == ADMIN_PASSWORD
             else:
                 correct_old = user.get('password') == old_password or users[username] == old_password
