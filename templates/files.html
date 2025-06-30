@@ -95,8 +95,12 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Загруженные файлы</h1>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold">Всего файлов: <span id="fileCount">{{ files|length }}</span></span>
+                <input type="text" class="form-control w-50" id="fileSearch" placeholder="Поиск по файлам...">
+              </div>
               {% if files %}
-                <ul class="list-group">
+                <ul class="list-group" id="fileList">
                   {% for file in files %}
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-white">
                       <span>{{ file }}
@@ -164,6 +168,23 @@
         if (formToDelete) {
           formToDelete.submit();
         }
+      });
+      // Фильтр по файлам
+      const fileSearch = document.getElementById('fileSearch');
+      const fileList = document.getElementById('fileList');
+      const fileCount = document.getElementById('fileCount');
+      fileSearch.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        let visible = 0;
+        fileList.querySelectorAll('li').forEach(function(li) {
+          if (li.textContent.toLowerCase().includes(value)) {
+            li.style.display = '';
+            visible++;
+          } else {
+            li.style.display = 'none';
+          }
+        });
+        fileCount.textContent = visible;
       });
     </script>
   </body>
