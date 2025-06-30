@@ -2,12 +2,16 @@ import os
 import json
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory, flash, session
 from functools import wraps
+from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'uploads'
 USERS_FILE = 'users.json'
 FILES_FILE = 'files.json'
 ADMIN_USERNAME = 'SKRIBLDAX'
 ADMIN_PASSWORD = 'kakawka2281337'
+
+AVATAR_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
+ALLOWED_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -35,6 +39,9 @@ def save_files(files):
 
 def allowed_file(filename):
     return filename != ''
+
+def allowed_avatar(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_AVATAR_EXTENSIONS
 
 def login_required(f):
     @wraps(f)
@@ -147,6 +154,58 @@ def delete_file(filename):
     else:
         flash('Нет доступа для удаления файла!')
     return redirect(url_for('uploaded_files'))
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    users = load_users()
+    username = session['username']
+    user = users.get(username, {})
+    avatar_url = user.get('avatar')
+    if request.method == 'POST':
+        # Загрузка аватара
+        if 'avatar' in request.files:
+            file = request.files['avatar']
+            if file and file.filename and allowed_avatar(file.filename):
+                filename = secure_filename(f"{username}_avatar.{file.filename.rsplit('.', 1)[1].lower()}")
+                os.makedirs(AVATAR_FOLDER, exist_ok=True)
+                file.save(os.path.join(AVATAR_FOLDER, filename))
+                user['avatar'] = f"uploads/avatars/{filename}"
+                users[username] = user
+                save_users(users)
+                flash('Аватар успешно обновлён!')
+                return redirect(url_for('profile'))
+            else:
+                flash('Недопустимый формат аватара!')
+        # Смена пароля
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        if old_password and new_password and confirm_password:
+            if username == ADMIN_USERNAME:
+                correct_old = old_password == ADMIN_PASSWORD
+            else:
+                correct_old = user.get('password') == old_password or users[username] == old_password
+            if not correct_old:
+                flash('Старый пароль неверен!')
+            elif new_password != confirm_password:
+                flash('Новые пароли не совпадают!')
+            elif len(new_password) < 4:
+                flash('Пароль слишком короткий!')
+            else:
+                if username == ADMIN_USERNAME:
+                    global ADMIN_PASSWORD
+                    ADMIN_PASSWORD = new_password
+                user['password'] = new_password
+                users[username] = user
+                save_users(users)
+                flash('Пароль успешно изменён!')
+                return redirect(url_for('profile'))
+    return render_template('profile.html', avatar_url=avatar_url, username=username)
+
+@app.route('/uploads/avatars/<filename>')
+def avatar_file(filename):
+    return send_from_directory(AVATAR_FOLDER, filename)
 
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
