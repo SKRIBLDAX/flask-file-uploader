@@ -53,10 +53,6 @@ def login_required(f):
 def is_admin():
     return session.get('username') == ADMIN_USERNAME
 
-def set_admin_password(new_password):
-    global ADMIN_PASSWORD
-    ADMIN_PASSWORD = new_password
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -80,7 +76,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         users = load_users()
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        if username == ADMIN_USERNAME and users.get(ADMIN_USERNAME, {}).get('password') == password:
             session['username'] = username
             flash('Вы вошли как администратор!')
             return redirect(url_for('upload_file'))
@@ -185,8 +181,9 @@ def profile():
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
         if old_password and new_password and confirm_password:
+            admin_password = users.get(ADMIN_USERNAME, {}).get('password')
             if username == ADMIN_USERNAME:
-                correct_old = old_password == ADMIN_PASSWORD
+                correct_old = old_password == admin_password
             else:
                 correct_old = user.get('password') == old_password or users[username] == old_password
             if not correct_old:
@@ -196,10 +193,7 @@ def profile():
             elif len(new_password) < 4:
                 flash('Пароль слишком короткий!')
             else:
-                if username == ADMIN_USERNAME:
-                    set_admin_password(new_password)
-                user['password'] = new_password
-                users[username] = user
+                users[username]['password'] = new_password
                 save_users(users)
                 flash('Пароль успешно изменён!')
                 return redirect(url_for('profile'))
