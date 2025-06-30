@@ -140,6 +140,19 @@
           icon.classList.add('fa-eye');
         }
       });
+      // Автофокус на первое поле при открытии вкладки
+      function setFocus(tab) {
+        if (tab === 'login') {
+          document.getElementById('login-username').focus();
+        } else if (tab === 'register') {
+          document.getElementById('register-username').focus();
+        }
+      }
+      // При загрузке страницы автофокус на логин
+      setFocus('login');
+      // При переключении вкладок автофокус
+      document.getElementById('login-tab').addEventListener('shown.bs.tab', function() { setFocus('login'); });
+      document.getElementById('register-tab').addEventListener('shown.bs.tab', function() { setFocus('register'); });
     </script>
   </body>
 </html> 
