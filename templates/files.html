@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <title>Загруженные файлы</title>
+  </head>
+  <body>
+    <h1>Загруженные файлы</h1>
+    <ul>
+      {% for file in files %}
+        <li>
+          <a href="{{ url_for('uploaded_file', filename=file) }}">{{ file }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('upload_file') }}">Назад к загрузке</a>
+  </body>
+</html> 

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <title>Загрузка файла</title>
+  </head>
+  <body>
+    <h1>Загрузить файл</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Загрузить">
+    </form>
+    <a href="{{ url_for('uploaded_files') }}">Посмотреть загруженные файлы</a>
+  </body>
+</html>
