@@ -2,8 +2,8 @@ import os
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory, flash, session
 
 UPLOAD_FOLDER = 'uploads'
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'password123'  # Задайте свой пароль
+ADMIN_USERNAME = 'SKRIBLDAX'
+ADMIN_PASSWORD = 'kakawka2281337'  # Задайте свой пароль
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
