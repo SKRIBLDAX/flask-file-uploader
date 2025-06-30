@@ -8,7 +8,6 @@ UPLOAD_FOLDER = 'uploads'
 USERS_FILE = 'users.json'
 FILES_FILE = 'files.json'
 ADMIN_USERNAME = 'SKRIBLDAX'
-ADMIN_PASSWORD = 'kakawka2281337'
 
 AVATAR_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
 ALLOWED_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -53,6 +52,10 @@ def login_required(f):
 
 def is_admin():
     return session.get('username') == ADMIN_USERNAME
+
+def set_admin_password(new_password):
+    global ADMIN_PASSWORD
+    ADMIN_PASSWORD = new_password
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -194,8 +197,7 @@ def profile():
                 flash('Пароль слишком короткий!')
             else:
                 if username == ADMIN_USERNAME:
-                    global ADMIN_PASSWORD
-                    ADMIN_PASSWORD = new_password
+                    set_admin_password(new_password)
                 user['password'] = new_password
                 users[username] = user
                 save_users(users)
