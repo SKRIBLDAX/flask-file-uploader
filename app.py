@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = 'uploads'
 USERS_FILE = 'users.json'
 FILES_FILE = 'files.json'
-ADMIN_USERNAME = 'SKRIBLDAX'
+ADMIN_USERNAME = 'Tim_Gaide'
 
 AVATAR_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
 ALLOWED_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
