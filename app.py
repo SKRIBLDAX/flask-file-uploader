@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory, flash, session
+from functools import wraps
 
 UPLOAD_FOLDER = 'uploads'
 ADMIN_USERNAME = 'SKRIBLDAX'
@@ -12,6 +13,14 @@ app.secret_key = 'supersecretkey'  # Для сессий и flash-сообщен
 def allowed_file(filename):
     return filename != ''
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('is_admin'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -20,7 +29,7 @@ def login():
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['is_admin'] = True
             flash('Вы вошли как администратор!')
-            return redirect(url_for('uploaded_files'))
+            return redirect(url_for('upload_file'))
         else:
             flash('Неверный логин или пароль!')
     return render_template('login.html')
@@ -29,9 +38,10 @@ def login():
 def logout():
     session.pop('is_admin', None)
     flash('Вы вышли из аккаунта администратора.')
-    return redirect(url_for('uploaded_files'))
+    return redirect(url_for('login'))
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -53,6 +63,7 @@ def upload_file():
     return render_template('upload.html')
 
 @app.route('/files')
+@login_required
 def uploaded_files():
     files = []
     if os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -65,6 +76,7 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/delete/<filename>', methods=['POST'])
+@login_required
 def delete_file(filename):
     if not session.get('is_admin'):
         flash('Нет доступа для удаления файла!')
