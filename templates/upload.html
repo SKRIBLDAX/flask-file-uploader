@@ -128,6 +128,7 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Загрузить файл</h1>
+              <div id="funnyPhrase" class="mb-4 text-center fw-bold" style="font-size:1.3rem;"></div>
               <img id="previewImg" class="preview-img" alt="Превью изображения" />
               <form method="post" enctype="multipart/form-data">
                 <div class="mb-3">
@@ -184,6 +185,19 @@
       });
       // Применить тему при загрузке
       setTheme(localStorage.getItem('theme') || 'light');
+      // Смешная фраза над формой загрузки
+      const adjectives = [
+        'сверкающий', 'огромный', 'пушистый', 'грустный', 'радужный', 'загадочный', 'шумный', 'ленивый', 'весёлый', 'злой', 'мокрый', 'гордый', 'квадратный', 'смешной', 'космический', 'потерянный', 'сочный', 'бодрый', 'нежный', 'странный'
+      ];
+      const nouns = [
+        'огурец', 'слон', 'пельмень', 'кекс', 'ёжик', 'арбуз', 'крокодил', 'пельмень', 'попугай', 'банан', 'кот', 'пылесос', 'чемодан', 'пингвин', 'бегемот', 'чайник', 'петух', 'пельмень', 'пельмень', 'пельмень'
+      ];
+      function getFunnyPhrase() {
+        const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const noun = nouns[Math.floor(Math.random() * nouns.length)];
+        return adj + ' ' + noun;
+      }
+      document.getElementById('funnyPhrase').textContent = getFunnyPhrase();
     </script>
   </body>
 </html>
