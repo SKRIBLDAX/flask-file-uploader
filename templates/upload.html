@@ -104,7 +104,12 @@
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <li><a class="dropdown-item" href="{{ url_for('profile') }}">Профиль</a></li>
             <li><a class="dropdown-item" href="{{ url_for('uploaded_files') }}">Мои файлы</a></li>
-            <li><button class="dropdown-item" id="toggleThemeBtn" type="button">Тёмная тема</button></li>
+            <li class="px-3 py-2">
+              <div class="form-check form-switch d-flex align-items-center">
+                <input class="form-check-input" type="checkbox" id="themeSwitch">
+                <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
+              </div>
+            </li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
           </ul>
@@ -154,21 +159,22 @@
           preview.style.display = 'none';
         }
       });
-      // Тема сайта
+      // Тема сайта через переключатель
       function setTheme(theme) {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
           localStorage.setItem('theme', 'dark');
-          document.getElementById('toggleThemeBtn').textContent = 'Светлая тема';
+          document.getElementById('themeSwitch').checked = true;
+          document.getElementById('themeSwitchLabel').textContent = 'Светлая тема';
         } else {
           document.documentElement.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
-          document.getElementById('toggleThemeBtn').textContent = 'Тёмная тема';
+          document.getElementById('themeSwitch').checked = false;
+          document.getElementById('themeSwitchLabel').textContent = 'Тёмная тема';
         }
       }
-      document.getElementById('toggleThemeBtn').addEventListener('click', function() {
-        const current = localStorage.getItem('theme') || 'light';
-        setTheme(current === 'light' ? 'dark' : 'light');
+      document.getElementById('themeSwitch').addEventListener('change', function() {
+        setTheme(this.checked ? 'dark' : 'light');
       });
       // Применить тему при загрузке
       setTheme(localStorage.getItem('theme') || 'light');
