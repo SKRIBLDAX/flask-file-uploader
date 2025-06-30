@@ -117,12 +117,10 @@ def upload_file():
 @login_required
 def uploaded_files():
     files = load_files()
-    if is_admin():
-        user_files = list(files.keys())
-    else:
-        user_files = [fname for fname, user in files.items() if user == session['username']]
+    all_files = list(files.keys())
     is_admin_flag = is_admin()
-    return render_template('files.html', files=user_files, is_admin=is_admin_flag)
+    username = session.get('username')
+    return render_template('files.html', files=all_files, is_admin=is_admin_flag, username=username, files_owners=files)
 
 @app.route('/uploads/<filename>')
 @login_required
