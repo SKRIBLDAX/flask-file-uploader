@@ -28,6 +28,7 @@
       .card-title, .user-name, a, .btn-purple { color: var(--primary) !important; }
       .btn-purple {
         background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: #fff !important;
         border: none;
       }
       .btn-purple:hover {
@@ -46,8 +47,13 @@
       .card { border: none; border-radius: 1.5rem; }
       .form-control[type="file"] {
         border-radius: 1rem;
-        border: 1px solid #a78bfa;
-        background: #fff;
+        border: 1px solid var(--border);
+        background: #e5e7eb;
+        color: #222;
+      }
+      [data-theme='dark'] .form-control[type="file"] {
+        background: #2a2a3a;
+        color: #f3f3f3;
       }
       .card-title {
         color: #7c3aed;
