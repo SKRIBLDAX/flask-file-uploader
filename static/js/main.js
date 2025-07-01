@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
             const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownToggle);
             dropdown.show();
+            dropdownToggle.focus();
           }, 0);
         }
       }
