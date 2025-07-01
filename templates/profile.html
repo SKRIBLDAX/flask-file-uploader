@@ -64,24 +64,42 @@
     </style>
   </head>
   <body>
-    <!-- Переключатель темы и языка оставлен, все лишние кнопки и навигация сверху удалены -->
-    <div style="position: absolute; top: 24px; right: 40px; z-index: 1000; display: flex; gap: 1rem;">
-      <div class="form-check form-switch d-flex align-items-center">
-        <input class="form-check-input" type="checkbox" id="themeSwitch">
-        <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
-      </div>
-      <div>
-        <div class="dropdown">
-          <a class="btn btn-light dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span id="langLabel">RU</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-            <li><a class="dropdown-item lang-option" href="#" data-lang="ru">Русский</a></li>
-            <li><a class="dropdown-item lang-option" href="#" data-lang="en">English</a></li>
+    <!-- Логотип и меню пользователя -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-transparent mb-4">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/" style="color:#7c3aed;font-size:1.3rem;"><i class="fa fa-cloud-upload-alt me-2"></i>PaksentukFiles</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="/files"><i class="fa fa-folder-open me-1"></i>Мои файлы</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile"><i class="fa fa-user me-1"></i>Профиль</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="user-name">{{ session['username'] }}</span>
+                <i class="fa-solid fa-user-circle fa-lg ms-2" style="color:#7c3aed;"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="/profile"><i class="fa fa-user me-1"></i>Профиль</a></li>
+                <li><a class="dropdown-item" href="/files"><i class="fa fa-folder-open me-1"></i>Мои файлы</a></li>
+                <li><a class="dropdown-item" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a></li>
+                <li><a class="dropdown-item" href="/profile#password"><i class="fa fa-key me-1"></i>Сменить пароль</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="/logout" id="logoutLink"><i class="fa fa-sign-out-alt me-1"></i>Выйти</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
-    </div>
+    </nav>
     <div class="container py-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
@@ -165,42 +183,6 @@
         </div>
       </div>
     </div>
-    <!-- Логотип и меню пользователя -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-transparent mb-4">
-      <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/" style="color:#7c3aed;font-size:1.3rem;"><i class="fa fa-cloud-upload-alt me-2"></i>PaksentukFiles</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-          <ul class="navbar-nav align-items-center">
-            <li class="nav-item">
-              <a class="nav-link" href="/files"><i class="fa fa-folder-open me-1"></i>Мои файлы</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/profile"><i class="fa fa-user me-1"></i>Профиль</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="user-name">{{ session['username'] }}</span>
-                <i class="fa-solid fa-user-circle fa-lg ms-2" style="color:#7c3aed;"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="/profile"><i class="fa fa-user me-1"></i>Профиль</a></li>
-                <li><a class="dropdown-item" href="/files"><i class="fa fa-folder-open me-1"></i>Мои файлы</a></li>
-                <li><a class="dropdown-item" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a></li>
-                <li><a class="dropdown-item" href="/profile#password"><i class="fa fa-key me-1"></i>Сменить пароль</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="/logout" id="logoutLink"><i class="fa fa-sign-out-alt me-1"></i>Выйти</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
     <!-- Переключатель языка в левом нижнем углу -->
     <div id="langSwitcher" style="position:fixed;left:20px;bottom:20px;z-index:2000;">
       <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
