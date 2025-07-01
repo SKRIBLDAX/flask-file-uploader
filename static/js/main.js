@@ -83,7 +83,19 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.lang-option-dropdown').forEach(el => {
     el.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       setLang(this.dataset.lang);
+      // Оставить dropdown открытым
+      const dropdownMenu = this.closest('.dropdown-menu');
+      if (dropdownMenu) {
+        const dropdownToggle = dropdownMenu.parentElement.querySelector('[data-bs-toggle="dropdown"]');
+        if (dropdownToggle) {
+          setTimeout(() => {
+            const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownToggle);
+            dropdown.show();
+          }, 0);
+        }
+      }
     });
   });
   document.querySelectorAll('.lang-option').forEach(el => {
