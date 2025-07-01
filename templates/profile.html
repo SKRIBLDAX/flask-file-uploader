@@ -158,101 +158,94 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Универсальный скрипт для синхронизации темы
-      function setTheme(theme) {
-        if (theme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          localStorage.setItem('theme', 'dark');
-          document.getElementById('themeSwitch').checked = true;
-          document.getElementById('themeSwitchLabel').textContent = 'светлая тема';
-        } else {
-          document.documentElement.setAttribute('data-theme', 'light');
-          localStorage.setItem('theme', 'light');
-          document.getElementById('themeSwitch').checked = false;
-          document.getElementById('themeSwitchLabel').textContent = 'тёмная тема';
+      window.onload = function() {
+        // Универсальный скрипт для синхронизации темы
+        function setTheme(theme) {
+          if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('themeSwitch').checked = true;
+            document.getElementById('themeSwitchLabel').textContent = translations[localStorage.getItem('lang')||'ru'].light;
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('themeSwitch').checked = false;
+            document.getElementById('themeSwitchLabel').textContent = translations[localStorage.getItem('lang')||'ru'].dark;
+          }
         }
-      }
-      // Инициализация темы при загрузке
-      setTheme(localStorage.getItem('theme') || 'light');
-      // Обработчик переключателя
-      document.getElementById('themeSwitch').addEventListener('change', function() {
-        setTheme(this.checked ? 'dark' : 'light');
-      });
-      // Подтверждение смены пароля
-      document.getElementById('passwordForm')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('confirmPasswordModal'));
-        modal.show();
-        document.getElementById('confirmPasswordBtn').onclick = function() {
-          modal.hide();
-          document.getElementById('passwordForm').submit();
+        // Инициализация темы при загрузке
+        setTheme(localStorage.getItem('theme') || 'light');
+        // Обработчик переключателя
+        document.getElementById('themeSwitch').addEventListener('change', function() {
+          setTheme(this.checked ? 'dark' : 'light');
+        });
+        // Локализация
+        const translations = {
+          ru: {
+            profile: 'Профиль:',
+            avatar: 'Аватар',
+            change: 'Сменить пароль',
+            upload: 'Загрузить аватар',
+            old: 'Старый пароль',
+            new: 'Новый пароль',
+            confirm: 'Подтвердите новый пароль',
+            changeBtn: 'Сменить пароль',
+            back: 'Назад',
+            theme: 'Тёмная тема',
+            light: 'светлая тема',
+            dark: 'тёмная тема',
+            lang: 'Язык',
+          },
+          en: {
+            profile: 'Profile:',
+            avatar: 'Avatar',
+            change: 'Change password',
+            upload: 'Upload avatar',
+            old: 'Old password',
+            new: 'New password',
+            confirm: 'Confirm new password',
+            changeBtn: 'Change password',
+            back: 'Back',
+            theme: 'Dark theme',
+            light: 'light theme',
+            dark: 'dark theme',
+            lang: 'Language',
+          }
         };
-      });
-      // Локализация
-      const translations = {
-        ru: {
-          profile: 'Профиль:',
-          avatar: 'Аватар',
-          change: 'Сменить пароль',
-          upload: 'Загрузить аватар',
-          old: 'Старый пароль',
-          new: 'Новый пароль',
-          confirm: 'Подтвердите новый пароль',
-          changeBtn: 'Сменить пароль',
-          back: 'Назад',
-          theme: 'Тёмная тема',
-          lang: 'Язык',
-        },
-        en: {
-          profile: 'Profile:',
-          avatar: 'Avatar',
-          change: 'Change password',
-          upload: 'Upload avatar',
-          old: 'Old password',
-          new: 'New password',
-          confirm: 'Confirm new password',
-          changeBtn: 'Change password',
-          back: 'Back',
-          theme: 'Dark theme',
-          lang: 'Language',
+        function setLang(lang) {
+          localStorage.setItem('lang', lang);
+          document.getElementById('langLabel').textContent = lang.toUpperCase();
+          document.querySelector('.card-title').innerHTML = translations[lang].profile + ' {{ username }}';
+          document.getElementById('avatar-tab').textContent = translations[lang].avatar;
+          document.getElementById('password-tab').textContent = translations[lang].change;
+          document.querySelector('button[type="submit"]').textContent = translations[lang].upload;
+          document.querySelector('label[for="old_password"]').textContent = translations[lang].old;
+          document.querySelector('label[for="new_password"]').textContent = translations[lang].new;
+          document.querySelector('label[for="confirm_password"]').textContent = translations[lang].confirm;
+          document.querySelector('#passwordForm button[type="submit"]').textContent = translations[lang].changeBtn;
+          document.querySelector('.mt-3.text-center a').textContent = translations[lang].back;
+          document.getElementById('themeSwitchLabel').textContent = document.getElementById('themeSwitch').checked ? translations[lang].light : translations[lang].dark;
+        }
+        document.querySelectorAll('.lang-option').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            setLang(this.dataset.lang);
+          });
+        });
+        setLang(localStorage.getItem('lang') || 'ru');
+        // Сохранение состояния вкладок
+        document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(btn => {
+          btn.addEventListener('shown.bs.tab', function(e) {
+            localStorage.setItem('profileTab', e.target.id);
+          });
+        });
+        // При загрузке страницы открываем сохранённую вкладку
+        const savedTab = localStorage.getItem('profileTab');
+        if (savedTab) {
+          const tabBtn = document.getElementById(savedTab);
+          if (tabBtn) new bootstrap.Tab(tabBtn).show();
         }
       };
-      function setLang(lang) {
-        localStorage.setItem('lang', lang);
-        document.getElementById('langLabel').textContent = lang.toUpperCase();
-        document.querySelector('.card-title').innerHTML = translations[lang].profile + ' {{ username }}';
-        document.querySelector('button#avatar-tab').textContent = translations[lang].avatar;
-        document.querySelector('button#password-tab').textContent = translations[lang].change;
-        document.querySelector('button[type="submit"]').textContent = translations[lang].upload;
-        document.querySelector('label[for="old_password"]').textContent = translations[lang].old;
-        document.querySelector('label[for="new_password"]').textContent = translations[lang].new;
-        document.querySelector('label[for="confirm_password"]').textContent = translations[lang].confirm;
-        document.querySelector('#passwordForm button[type="submit"]').textContent = translations[lang].changeBtn;
-        document.querySelector('.mt-3.text-center a').textContent = translations[lang].back;
-        document.getElementById('themeSwitchLabel').textContent = translations[lang].theme;
-      }
-      document.querySelectorAll('.lang-option').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.preventDefault();
-          setLang(this.dataset.lang);
-        });
-      });
-      setLang(localStorage.getItem('lang') || 'ru');
-      // Сохранение состояния вкладок
-      const profileTabs = document.getElementById('profileTabs');
-      const profileTabsContent = document.getElementById('profileTabsContent');
-      // При переключении вкладки сохраняем её id
-      document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(btn => {
-        btn.addEventListener('shown.bs.tab', function(e) {
-          localStorage.setItem('profileTab', e.target.id);
-        });
-      });
-      // При загрузке страницы открываем сохранённую вкладку
-      const savedTab = localStorage.getItem('profileTab');
-      if (savedTab) {
-        const tabBtn = document.getElementById(savedTab);
-        if (tabBtn) new bootstrap.Tab(tabBtn).show();
-      }
     </script>
   </body>
 </html> 
