@@ -3,6 +3,7 @@ import json
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory, flash, session
 from functools import wraps
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 UPLOAD_FOLDER = 'uploads'
 USERS_FILE = 'users.json'
@@ -115,9 +116,15 @@ def upload_file():
                 flash('Некорректное имя файла')
                 return redirect(request.url)
             os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
             files = load_files()
-            files[filename] = session['username']
+            stat = os.stat(file_path)
+            files[filename] = {
+                'owner': session['username'],
+                'size': stat.st_size,
+                'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
             save_files(files)
             flash('Файл успешно загружен')
             return redirect(url_for('uploaded_files'))
@@ -220,9 +227,15 @@ def upload_ajax():
         if filename is None:
             return {'success': False, 'message': 'Некорректное имя файла'}, 400
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
         files = load_files()
-        files[filename] = session['username']
+        stat = os.stat(file_path)
+        files[filename] = {
+            'owner': session['username'],
+            'size': stat.st_size,
+            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
         save_files(files)
         return {'success': True, 'message': 'Файл успешно загружен'}, 200
     return {'success': False, 'message': 'Ошибка загрузки файла'}, 400
