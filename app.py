@@ -207,6 +207,26 @@ def profile():
 def avatar_file(filename):
     return send_from_directory(AVATAR_FOLDER, filename)
 
+@app.route('/upload_ajax', methods=['POST'])
+@login_required
+def upload_ajax():
+    if 'file' not in request.files:
+        return {'success': False, 'message': 'Нет файла в запросе'}, 400
+    file = request.files['file']
+    if file.filename == '':
+        return {'success': False, 'message': 'Файл не выбран'}, 400
+    if file and allowed_file(file.filename):
+        filename = file.filename
+        if filename is None:
+            return {'success': False, 'message': 'Некорректное имя файла'}, 400
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        files = load_files()
+        files[filename] = session['username']
+        save_files(files)
+        return {'success': True, 'message': 'Файл успешно загружен'}, 200
+    return {'success': False, 'message': 'Ошибка загрузки файла'}, 400
+
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=False)
