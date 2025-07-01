@@ -84,14 +84,29 @@
       }
       #funnyPhrase { color: #444; }
       [data-theme='dark'] #funnyPhrase { color: #e0e0ff; }
+      /* --- Адаптивность --- */
+      @media (max-width: 768px) {
+        .container, .container-fluid { padding: 0 5px !important; }
+        .card { border-radius: 1rem; }
+        .user-menu { right: 10px; top: 10px; }
+        .card-title { font-size: 1.2rem; }
+        .btn, .btn-purple { font-size: 1rem; padding: 10px 0; }
+        .preview-img { max-height: 120px; }
+      }
+      @media (max-width: 480px) {
+        .card { border-radius: 0.5rem; }
+        .card-title { font-size: 1rem; }
+        .btn, .btn-purple { font-size: 0.95rem; }
+        .user-menu { right: 2px; top: 2px; }
+      }
     </style>
   </head>
   <body>
     <!-- Toast уведомления -->
     <div class="toast-container">
-      {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-          <div class="toast align-items-center text-bg-primary border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="toast align-items-center border-0 show mb-2 text-bg-{{ 'success' if category=='success' else 'danger' if category=='error' else 'info' if category=='info' else 'warning' if category=='warning' else 'primary' }}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
             <div class="d-flex">
               <div class="toast-body">{{ message }}</div>
               <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -131,8 +146,16 @@
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Загрузить файл</h1>
               <div id="funnyPhrase" class="mb-4 text-center fw-bold" style="font-size:1.3rem;"></div>
-              <img id="previewImg" class="preview-img" alt="Превью изображения" />
-              <form method="post" enctype="multipart/form-data">
+              <!-- Drag&Drop зона -->
+              <div id="dropZone" class="mb-3 p-4 text-center border border-2 border-dashed rounded" style="cursor:pointer; background:#f3f3ff; transition:background 0.2s;">
+                <i class="fa fa-cloud-upload-alt fa-2x mb-2"></i><br>
+                <span id="dropZoneText">Перетащите файл сюда или выберите ниже</span>
+                <div id="filePreview" class="mt-2"></div>
+                <div class="progress mt-2" style="display:none;">
+                  <div class="progress-bar" role="progressbar" style="width:0%">0%</div>
+                </div>
+              </div>
+              <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
                 <div class="mb-3">
                   <input class="form-control" type="file" name="file" id="fileInput">
                 </div>
@@ -152,22 +175,114 @@
       document.querySelectorAll('.toast').forEach(function(toastEl) {
         new bootstrap.Toast(toastEl).show();
       });
-      // Превью изображения
-      document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const preview = document.getElementById('previewImg');
-        if (file && file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            preview.src = ev.target.result;
-            preview.style.display = 'block';
-          };
-          reader.readAsDataURL(file);
-        } else {
-          preview.src = '';
-          preview.style.display = 'none';
+      // Drag&Drop логика
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const filePreview = document.getElementById('filePreview');
+      const progressBar = dropZone.querySelector('.progress-bar');
+      const progressWrap = dropZone.querySelector('.progress');
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.style.background = '#e0e7ff';
+      });
+      dropZone.addEventListener('dragleave', e => {
+        e.preventDefault();
+        dropZone.style.background = '#f3f3ff';
+      });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.background = '#f3f3ff';
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          showPreview(e.dataTransfer.files[0]);
         }
       });
+      fileInput.addEventListener('change', function(e) {
+        if (this.files[0]) showPreview(this.files[0]);
+      });
+      function showPreview(file) {
+        filePreview.innerHTML = '';
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.className = 'preview-img';
+          img.style.display = 'block';
+          img.style.maxWidth = '120px';
+          img.style.maxHeight = '120px';
+          const reader = new FileReader();
+          reader.onload = ev => img.src = ev.target.result;
+          reader.readAsDataURL(file);
+          filePreview.appendChild(img);
+        } else {
+          // Иконка по типу файла
+          const icon = document.createElement('i');
+          icon.className = 'fa fa-file fa-3x mb-2';
+          let color = '#7c3aed';
+          if (file.type.includes('pdf')) icon.className = 'fa fa-file-pdf fa-3x mb-2', color = '#e53e3e';
+          if (file.type.includes('audio')) icon.className = 'fa fa-file-audio fa-3x mb-2', color = '#3182ce';
+          if (file.type.includes('video')) icon.className = 'fa fa-file-video fa-3x mb-2', color = '#805ad5';
+          if (file.type.includes('zip') || file.name.endsWith('.zip')) icon.className = 'fa fa-file-archive fa-3x mb-2', color = '#d69e2e';
+          icon.style.color = color;
+          filePreview.appendChild(icon);
+        }
+        filePreview.appendChild(document.createElement('br'));
+        const info = document.createElement('span');
+        info.textContent = `${file.name} (${Math.round(file.size/1024)} КБ)`;
+        filePreview.appendChild(info);
+      }
+      // AJAX-загрузка с прогрессом
+      document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        if (!file) {
+          showToast('Не выбран файл!', 'danger');
+          return;
+        }
+        const formData = new FormData();
+        formData.append('file', file);
+        progressWrap.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        fetch('/upload_ajax', {
+          method: 'POST',
+          body: formData
+        }).then(async response => {
+          const data = await response.json();
+          if (response.ok && data.success) {
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.href = '/files', 1200);
+          } else {
+            showToast(data.message || 'Ошибка загрузки', 'danger');
+            progressWrap.style.display = 'none';
+          }
+        }).catch(() => {
+          showToast('Ошибка сети!', 'danger');
+          progressWrap.style.display = 'none';
+        });
+        // Прогресс
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = function(e) {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent + '%';
+          }
+        };
+      });
+      // Toast-уведомление
+      function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center border-0 show mb-2 text-bg-${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>`;
+        document.querySelector('.toast-container').appendChild(toast);
+        new bootstrap.Toast(toast).show();
+        setTimeout(() => toast.remove(), 4000);
+      }
       // Тема сайта через переключатель
       function setTheme(theme) {
         if (theme === 'dark') {
