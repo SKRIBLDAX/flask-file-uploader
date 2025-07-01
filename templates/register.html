@@ -27,6 +27,18 @@
       }
       a { color: #7c3aed; }
       a:hover { color: #4c1d95; }
+      /* --- Адаптивность --- */
+      @media (max-width: 768px) {
+        .container, .container-fluid { padding: 0 5px !important; }
+        .card { border-radius: 1rem; }
+        .card-title { font-size: 1.2rem; }
+        .btn, .btn-purple { font-size: 1rem; padding: 10px 0; }
+      }
+      @media (max-width: 480px) {
+        .card { border-radius: 0.5rem; }
+        .card-title { font-size: 1rem; }
+        .btn, .btn-purple { font-size: 0.95rem; }
+      }
     </style>
   </head>
   <body>
@@ -37,19 +49,29 @@
         <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
       </div>
     </div>
+    <!-- Кнопка переключения языка -->
+    <div id="langSwitcher" style="position:fixed;left:20px;bottom:20px;z-index:2000;">
+      <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <span id="langFlag">🇷🇺</span> <span id="langLabel" class="ms-2">RU</span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="langDropdown">
+        <li><a class="dropdown-item lang-option" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
+        <li><a class="dropdown-item lang-option" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
+      </ul>
+    </div>
     <div class="container py-5">
       <div class="row justify-content-center">
         <div class="col-md-5">
           <div class="card shadow-sm">
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Регистрация</h1>
-              {% with messages = get_flashed_messages() %}
+              {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                  <div class="alert alert-danger">
-                    {% for message in messages %}
-                      <div>{{ message }}</div>
-                    {% endfor %}
-                  </div>
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category=='success' else 'danger' if category=='error' else 'info' if category=='info' else 'warning' if category=='warning' else 'primary' }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
                 {% endif %}
               {% endwith %}
               <form method="post">
@@ -93,6 +115,42 @@
       document.getElementById('themeSwitch').addEventListener('change', function() {
         setTheme(this.checked ? 'dark' : 'light');
       });
+      // Локализация
+      const translations = {
+        ru: {
+          regTitle: 'Регистрация',
+          username: 'Логин',
+          password: 'Пароль',
+          regBtn: 'Зарегистрироваться',
+          already: 'Уже есть аккаунт? Войти',
+          theme: 'Тёмная тема',
+        },
+        en: {
+          regTitle: 'Registration',
+          username: 'Username',
+          password: 'Password',
+          regBtn: 'Sign up',
+          already: 'Already have an account? Login',
+          theme: 'Dark theme',
+        }
+      };
+      function setLang(lang) {
+        localStorage.setItem('lang', lang);
+        document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
+        document.querySelector('.card-title').textContent = translations[lang].regTitle;
+        document.querySelector('label[for="username"]').textContent = translations[lang].username;
+        document.querySelector('label[for="password"]').textContent = translations[lang].password;
+        document.querySelector('button[type="submit"]').textContent = translations[lang].regBtn;
+        document.querySelector('.mt-3.text-center a').textContent = translations[lang].already;
+      }
+      document.querySelectorAll('.lang-option').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          setLang(this.dataset.lang);
+        });
+      });
+      setLang(localStorage.getItem('lang') || 'ru');
     </script>
   </body>
 </html> 

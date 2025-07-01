@@ -28,6 +28,18 @@
       a { color: #7c3aed; }
       a:hover { color: #4c1d95; }
       .input-group-text { cursor: pointer; }
+      /* --- Адаптивность --- */
+      @media (max-width: 768px) {
+        .container, .container-fluid { padding: 0 5px !important; }
+        .card { border-radius: 1rem; }
+        .card-title { font-size: 1.2rem; }
+        .btn, .btn-purple { font-size: 1rem; padding: 10px 0; }
+      }
+      @media (max-width: 480px) {
+        .card { border-radius: 0.5rem; }
+        .card-title { font-size: 1rem; }
+        .btn, .btn-purple { font-size: 0.95rem; }
+      }
     </style>
   </head>
   <body>
@@ -38,19 +50,29 @@
         <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
       </div>
     </div>
+    <!-- Кнопка переключения языка -->
+    <div id="langSwitcher" style="position:fixed;left:20px;bottom:20px;z-index:2000;">
+      <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <span id="langFlag">🇷🇺</span> <span id="langLabel" class="ms-2">RU</span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="langDropdown">
+        <li><a class="dropdown-item lang-option" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
+        <li><a class="dropdown-item lang-option" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
+      </ul>
+    </div>
     <div class="container py-5">
       <div class="row justify-content-center">
         <div class="col-md-5">
           <div class="card shadow-sm">
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Вход и регистрация</h1>
-              {% with messages = get_flashed_messages() %}
+              {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                  <div class="alert alert-danger">
-                    {% for message in messages %}
-                      <div>{{ message }}</div>
-                    {% endfor %}
-                  </div>
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category=='success' else 'danger' if category=='error' else 'info' if category=='info' else 'warning' if category=='warning' else 'primary' }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
                 {% endif %}
               {% endwith %}
               <ul class="nav nav-tabs mb-3" id="authTabs" role="tablist">
@@ -180,6 +202,66 @@
       // При переключении вкладок автофокус
       document.getElementById('login-tab').addEventListener('shown.bs.tab', function() { setFocus('login'); });
       document.getElementById('register-tab').addEventListener('shown.bs.tab', function() { setFocus('register'); });
+      // Локализация
+      const translations = {
+        ru: {
+          loginTitle: 'Вход и регистрация',
+          loginTab: 'Войти',
+          regTab: 'Регистрация',
+          username: 'Логин',
+          password: 'Пароль',
+          loginBtn: 'Войти',
+          regBtn: 'Зарегистрироваться',
+          already: 'Уже есть аккаунт? Войти',
+          noacc: 'Нет аккаунта? Зарегистрироваться',
+          show: 'Показать',
+          hide: 'Скрыть',
+          theme: 'Тёмная тема',
+          error: 'Ошибка',
+        },
+        en: {
+          loginTitle: 'Login & Registration',
+          loginTab: 'Login',
+          regTab: 'Register',
+          username: 'Username',
+          password: 'Password',
+          loginBtn: 'Login',
+          regBtn: 'Sign up',
+          already: 'Already have an account? Login',
+          noacc: 'No account? Register',
+          show: 'Show',
+          hide: 'Hide',
+          theme: 'Dark theme',
+          error: 'Error',
+        }
+      };
+      function setLang(lang) {
+        localStorage.setItem('lang', lang);
+        document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
+        document.querySelector('.card-title').textContent = translations[lang].loginTitle;
+        document.getElementById('login-tab').textContent = translations[lang].loginTab;
+        document.getElementById('register-tab').textContent = translations[lang].regTab;
+        document.querySelectorAll('label[for="login-username"], label[for="register-username"]').forEach(l => l.textContent = translations[lang].username);
+        document.querySelectorAll('label[for="login-password"], label[for="register-password"]').forEach(l => l.textContent = translations[lang].password);
+        document.querySelector('#loginForm button[type="submit"]').textContent = translations[lang].loginBtn;
+        document.querySelector('#registerForm button[type="submit"]').textContent = translations[lang].regBtn;
+        document.querySelectorAll('.nav-link').forEach((el, i) => {
+          if (i === 0) el.textContent = translations[lang].loginTab;
+          if (i === 1) el.textContent = translations[lang].regTab;
+        });
+        document.querySelectorAll('.mt-3.text-center a').forEach(a => {
+          if (a.getAttribute('href') === "{{ url_for('login') }}") a.textContent = translations[lang].already;
+          if (a.getAttribute('href') === "{{ url_for('register') }}") a.textContent = translations[lang].noacc;
+        });
+      }
+      document.querySelectorAll('.lang-option').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          setLang(this.dataset.lang);
+        });
+      });
+      setLang(localStorage.getItem('lang') || 'ru');
     </script>
   </body>
 </html> 
