@@ -227,6 +227,10 @@ def upload_ajax():
         return {'success': True, 'message': 'Файл успешно загружен'}, 200
     return {'success': False, 'message': 'Ошибка загрузки файла'}, 400
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=False)
