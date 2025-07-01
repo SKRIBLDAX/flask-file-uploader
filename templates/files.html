@@ -185,23 +185,37 @@
                 <input type="text" class="form-control w-50" id="fileSearch" placeholder="Поиск по файлам...">
               </div>
               {% if files %}
-                <ul class="list-group" id="fileList">
-                  {% for file in files %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-white">
-                      <span>{{ file }}
-                        <small class="text-muted">({{ files_owners[file] }})</small>
-                      </span>
-                      <div>
-                        <a class="btn btn-sm btn-purple" href="{{ url_for('uploaded_file', filename=file) }}" download>Скачать</a>
-                        {% if is_admin or files_owners[file] == username %}
-                        <form method="post" action="{{ url_for('delete_file', filename=file) }}" class="delete-form d-inline">
-                          <button type="submit" class="btn btn-sm btn-delete" data-filename="{{ file }}">Удалить</button>
-                        </form>
-                        {% endif %}
-                      </div>
-                    </li>
-                  {% endfor %}
-                </ul>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle" id="filesTable">
+                    <thead>
+                      <tr>
+                        <th scope="col" style="cursor:pointer" onclick="sortTable(0)">Имя файла <i class="fa fa-sort"></i></th>
+                        <th scope="col" style="cursor:pointer" onclick="sortTable(1)">Владелец <i class="fa fa-sort"></i></th>
+                        <th scope="col" style="cursor:pointer" onclick="sortTable(2)">Размер <i class="fa fa-sort"></i></th>
+                        <th scope="col" style="cursor:pointer" onclick="sortTable(3)">Дата <i class="fa fa-sort"></i></th>
+                        <th scope="col">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody id="fileList">
+                      {% for file in files %}
+                        <tr>
+                          <td>{{ file.name }}</td>
+                          <td>{{ file.owner }}</td>
+                          <td>{{ (file.size/1024)|round(1) }} КБ</td>
+                          <td>{{ file.date }}</td>
+                          <td>
+                            <a class="btn btn-sm btn-purple" href="{{ url_for('uploaded_file', filename=file.name) }}" download>Скачать</a>
+                            {% if is_admin or file.owner == username %}
+                            <form method="post" action="{{ url_for('delete_file', filename=file.name) }}" class="delete-form d-inline">
+                              <button type="submit" class="btn btn-sm btn-delete" data-filename="{{ file.name }}">Удалить</button>
+                            </form>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               {% else %}
                 <div class="alert alert-warning text-center">Нет загруженных файлов</div>
               {% endif %}
@@ -339,6 +353,42 @@
         const modal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'));
         modal.show();
       });
+      // Сортировка таблицы файлов
+      function sortTable(n) {
+        const table = document.getElementById('filesTable');
+        let switching = true, dir = 'asc', switchcount = 0;
+        while (switching) {
+          switching = false;
+          const rows = table.rows;
+          for (let i = 1; i < (rows.length - 1); i++) {
+            let shouldSwitch = false;
+            let x = rows[i].getElementsByTagName('TD')[n];
+            let y = rows[i + 1].getElementsByTagName('TD')[n];
+            let cmp;
+            if (n === 2) { // Размер
+              cmp = parseFloat(x.textContent) - parseFloat(y.textContent);
+            } else if (n === 3) { // Дата
+              cmp = new Date(x.textContent) - new Date(y.textContent);
+            } else {
+              cmp = x.textContent.localeCompare(y.textContent);
+            }
+            if ((dir === 'asc' && cmp > 0) || (dir === 'desc' && cmp < 0)) {
+              shouldSwitch = true;
+              break;
+            }
+          }
+          if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+          } else {
+            if (switchcount === 0 && dir === 'asc') {
+              dir = 'desc';
+              switching = true;
+            }
+          }
+        }
+      }
     </script>
   </body>
 </html> 

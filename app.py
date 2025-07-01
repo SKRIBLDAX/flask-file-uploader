@@ -134,10 +134,25 @@ def upload_file():
 @login_required
 def uploaded_files():
     files = load_files()
-    all_files = list(files.keys())
+    files_info = []
+    for fname, meta in files.items():
+        if isinstance(meta, dict):
+            files_info.append({
+                'name': fname,
+                'owner': meta.get('owner', ''),
+                'size': meta.get('size', 0),
+                'date': meta.get('date', '')
+            })
+        else:
+            files_info.append({
+                'name': fname,
+                'owner': meta,
+                'size': 0,
+                'date': ''
+            })
     is_admin_flag = is_admin()
     username = session.get('username')
-    return render_template('files.html', files=all_files, is_admin=is_admin_flag, username=username, files_owners=files)
+    return render_template('files.html', files=files_info, is_admin=is_admin_flag, username=username)
 
 @app.route('/uploads/<filename>')
 @login_required
