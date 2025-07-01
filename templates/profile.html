@@ -39,6 +39,19 @@
         color: #7c3aed;
         font-weight: 600;
       }
+      /* --- Адаптивность --- */
+      @media (max-width: 768px) {
+        .container, .container-fluid { padding: 0 5px !important; }
+        .card { border-radius: 1rem; }
+        .card-title { font-size: 1.2rem; }
+        .btn, .btn-purple { font-size: 1rem; padding: 10px 0; }
+        .avatar-img { width: 80px; height: 80px; }
+      }
+      @media (max-width: 480px) {
+        .card { border-radius: 0.5rem; }
+        .card-title { font-size: 1rem; }
+        .btn, .btn-purple { font-size: 0.95rem; }
+      }
     </style>
   </head>
   <body>
@@ -55,13 +68,13 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <h1 class="card-title mb-4 text-center">Профиль: {{ username }}</h1>
-              {% with messages = get_flashed_messages() %}
+              {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                  <div class="alert alert-info">
-                    {% for message in messages %}
-                      <div>{{ message }}</div>
-                    {% endfor %}
-                  </div>
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category=='success' else 'danger' if category=='error' else 'info' if category=='info' else 'warning' if category=='warning' else 'primary' }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
                 {% endif %}
               {% endwith %}
               <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
@@ -89,7 +102,7 @@
                   </form>
                 </div>
                 <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
-                  <form method="post">
+                  <form method="post" id="passwordForm">
                     <div class="mb-3">
                       <label for="old_password" class="form-label">Старый пароль</label>
                       <input type="password" class="form-control" id="old_password" name="old_password" required>
@@ -110,6 +123,24 @@
                 <a href="{{ url_for('upload_file') }}">Назад</a>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно подтверждения смены пароля -->
+    <div class="modal fade" id="confirmPasswordModal" tabindex="-1" aria-labelledby="confirmPasswordLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmPasswordLabel">Подтвердите смену пароля</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Вы уверены, что хотите сменить пароль?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            <button type="button" class="btn btn-danger" id="confirmPasswordBtn">Сменить</button>
           </div>
         </div>
       </div>
@@ -135,6 +166,16 @@
       // Обработчик переключателя
       document.getElementById('themeSwitch').addEventListener('change', function() {
         setTheme(this.checked ? 'dark' : 'light');
+      });
+      // Подтверждение смены пароля
+      document.getElementById('passwordForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('confirmPasswordModal'));
+        modal.show();
+        document.getElementById('confirmPasswordBtn').onclick = function() {
+          modal.hide();
+          document.getElementById('passwordForm').submit();
+        };
       });
     </script>
   </body>
