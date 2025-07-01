@@ -469,6 +469,7 @@
         // no files
         const nofiles = document.querySelector('.alert-warning.text-center');
         if (nofiles) nofiles.textContent = translations[lang].nofiles;
+        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
       }
       document.querySelectorAll('.lang-option').forEach(el => {
         el.addEventListener('click', function(e) {

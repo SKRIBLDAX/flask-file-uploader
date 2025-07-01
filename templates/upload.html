@@ -394,6 +394,7 @@
       function setLang(lang) {
         localStorage.setItem('lang', lang);
         document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
         document.querySelector('.card-title').textContent = translations[lang].upload;
         document.getElementById('dropZoneText').textContent = translations[lang].drop;
         document.querySelector('#uploadForm button[type="submit"]').textContent = translations[lang].select;
