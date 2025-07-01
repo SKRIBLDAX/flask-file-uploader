@@ -152,6 +152,15 @@
                 <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
               </div>
             </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="langLabel">RU</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                <li><a class="dropdown-item lang-option" href="#" data-lang="ru">Русский</a></li>
+                <li><a class="dropdown-item lang-option" href="#" data-lang="en">English</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -356,6 +365,76 @@
         const modal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'));
         modal.show();
       });
+      // Локализация
+      const translations = {
+        ru: {
+          upload: 'Загрузить файл',
+          drop: 'Перетащите файл сюда или выберите ниже',
+          select: 'Загрузить',
+          files: 'Посмотреть загруженные файлы',
+          theme: 'Тёмная тема',
+          light: 'светлая тема',
+          dark: 'тёмная тема',
+          funny: 'Случайная фраза',
+          logout: 'Выйти',
+          profile: 'Профиль',
+          myfiles: 'Мои файлы',
+          uploadnav: 'Загрузка',
+          confirmLogout: 'Подтвердите выход',
+          sureLogout: 'Вы уверены, что хотите выйти из аккаунта?',
+          cancel: 'Отмена',
+          confirm: 'Выйти',
+        },
+        en: {
+          upload: 'Upload file',
+          drop: 'Drag & drop file here or choose below',
+          select: 'Upload',
+          files: 'View uploaded files',
+          theme: 'Dark theme',
+          light: 'light theme',
+          dark: 'dark theme',
+          funny: 'Funny phrase',
+          logout: 'Logout',
+          profile: 'Profile',
+          myfiles: 'My files',
+          uploadnav: 'Upload',
+          confirmLogout: 'Confirm logout',
+          sureLogout: 'Are you sure you want to logout?',
+          cancel: 'Cancel',
+          confirm: 'Logout',
+        }
+      };
+      function setLang(lang) {
+        localStorage.setItem('lang', lang);
+        document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.querySelector('.card-title').textContent = translations[lang].upload;
+        document.getElementById('dropZoneText').textContent = translations[lang].drop;
+        document.querySelector('#uploadForm button[type="submit"]').textContent = translations[lang].select;
+        document.querySelector('.mt-3.text-center a').textContent = translations[lang].files;
+        document.getElementById('themeSwitchLabel').textContent = translations[lang].theme;
+        // dropdown nav
+        document.querySelectorAll('.nav-link, .dropdown-item').forEach(el => {
+          if (el.href && el.href.endsWith('/profile')) el.innerHTML = `<i class='fa fa-user me-1'></i>${translations[lang].profile}`;
+          if (el.href && el.href.endsWith('/files')) el.innerHTML = `<i class='fa fa-folder-open me-1'></i>${translations[lang].myfiles}`;
+          if (el.href && el.href.endsWith('/')) el.innerHTML = `<i class='fa fa-upload me-1'></i>${translations[lang].uploadnav}`;
+          if (el.id === 'logoutLink') el.innerHTML = `<i class='fa fa-sign-out-alt me-1'></i>${translations[lang].logout}`;
+        });
+        // modal
+        const modal = document.getElementById('confirmLogoutModal');
+        if (modal) {
+          modal.querySelector('.modal-title').textContent = translations[lang].confirmLogout;
+          modal.querySelector('.modal-body').textContent = translations[lang].sureLogout;
+          modal.querySelector('.btn-secondary').textContent = translations[lang].cancel;
+          modal.querySelector('.btn-danger').textContent = translations[lang].confirm;
+        }
+      }
+      document.querySelectorAll('.lang-option').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          setLang(this.dataset.lang);
+        });
+      });
+      setLang(localStorage.getItem('lang') || 'ru');
     </script>
   </body>
 </html>
