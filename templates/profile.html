@@ -56,10 +56,21 @@
   </head>
   <body>
     <!-- Переключатель темы -->
-    <div style="position: absolute; top: 24px; right: 40px; z-index: 1000;">
+    <div style="position: absolute; top: 24px; right: 40px; z-index: 1000; display: flex; gap: 1rem;">
       <div class="form-check form-switch d-flex align-items-center">
         <input class="form-check-input" type="checkbox" id="themeSwitch">
         <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
+      </div>
+      <div>
+        <div class="dropdown">
+          <a class="btn btn-light dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span id="langLabel">RU</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+            <li><a class="dropdown-item lang-option" href="#" data-lang="ru">Русский</a></li>
+            <li><a class="dropdown-item lang-option" href="#" data-lang="en">English</a></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="container py-5">
@@ -177,6 +188,71 @@
           document.getElementById('passwordForm').submit();
         };
       });
+      // Локализация
+      const translations = {
+        ru: {
+          profile: 'Профиль:',
+          avatar: 'Аватар',
+          change: 'Сменить пароль',
+          upload: 'Загрузить аватар',
+          old: 'Старый пароль',
+          new: 'Новый пароль',
+          confirm: 'Подтвердите новый пароль',
+          changeBtn: 'Сменить пароль',
+          back: 'Назад',
+          theme: 'Тёмная тема',
+          lang: 'Язык',
+        },
+        en: {
+          profile: 'Profile:',
+          avatar: 'Avatar',
+          change: 'Change password',
+          upload: 'Upload avatar',
+          old: 'Old password',
+          new: 'New password',
+          confirm: 'Confirm new password',
+          changeBtn: 'Change password',
+          back: 'Back',
+          theme: 'Dark theme',
+          lang: 'Language',
+        }
+      };
+      function setLang(lang) {
+        localStorage.setItem('lang', lang);
+        document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.querySelector('.card-title').innerHTML = translations[lang].profile + ' {{ username }}';
+        document.querySelector('button#avatar-tab').textContent = translations[lang].avatar;
+        document.querySelector('button#password-tab').textContent = translations[lang].change;
+        document.querySelector('button[type="submit"]').textContent = translations[lang].upload;
+        document.querySelector('label[for="old_password"]').textContent = translations[lang].old;
+        document.querySelector('label[for="new_password"]').textContent = translations[lang].new;
+        document.querySelector('label[for="confirm_password"]').textContent = translations[lang].confirm;
+        document.querySelector('#passwordForm button[type="submit"]').textContent = translations[lang].changeBtn;
+        document.querySelector('.mt-3.text-center a').textContent = translations[lang].back;
+        document.getElementById('themeSwitchLabel').textContent = translations[lang].theme;
+      }
+      document.querySelectorAll('.lang-option').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          setLang(this.dataset.lang);
+        });
+      });
+      setLang(localStorage.getItem('lang') || 'ru');
+      // Сохранение состояния вкладок
+      const profileTabs = document.getElementById('profileTabs');
+      const profileTabsContent = document.getElementById('profileTabsContent');
+      // При переключении вкладки сохраняем её id
+      document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(btn => {
+        btn.addEventListener('shown.bs.tab', function(e) {
+          localStorage.setItem('profileTab', e.target.id);
+        });
+      });
+      // При загрузке страницы открываем сохранённую вкладку
+      const savedTab = localStorage.getItem('profileTab');
+      if (savedTab) {
+        const tabBtn = document.getElementById(savedTab);
+        if (tabBtn) new bootstrap.Tab(tabBtn).show();
+      }
     </script>
   </body>
 </html> 
