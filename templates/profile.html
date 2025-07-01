@@ -93,6 +93,21 @@
                 <li><a class="dropdown-item" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a></li>
                 <li><a class="dropdown-item" href="/profile#password"><i class="fa fa-key me-1"></i>Сменить пароль</a></li>
                 <li><hr class="dropdown-divider"></li>
+                <li class="dropdown-item">
+                  <div class="form-check form-switch d-flex align-items-center mb-2">
+                    <input class="form-check-input me-2" type="checkbox" id="themeSwitchDropdown">
+                    <label class="form-check-label" for="themeSwitchDropdown" id="themeSwitchLabelDropdown">Тёмная тема</label>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle w-100" type="button" id="langDropdownDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      <span id="langFlagDropdown">🇷🇺</span> <span id="langLabelDropdown" class="ms-2">RU</span>
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="langDropdownDropdown">
+                      <li><a class="dropdown-item lang-option-dropdown" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
+                      <li><a class="dropdown-item lang-option-dropdown" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
+                    </ul>
+                  </div>
+                </li>
                 <li><a class="dropdown-item text-danger" href="/logout" id="logoutLink"><i class="fa fa-sign-out-alt me-1"></i>Выйти</a></li>
               </ul>
             </li>
@@ -183,110 +198,54 @@
         </div>
       </div>
     </div>
-    <!-- Переключатель языка в левом нижнем углу -->
-    <div id="langSwitcher" style="position:fixed;left:20px;bottom:20px;z-index:2000;">
-      <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <span id="langFlag">🇷🇺</span> <span id="langLabel" class="ms-2">RU</span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="langDropdown">
-        <li><a class="dropdown-item lang-option" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
-        <li><a class="dropdown-item lang-option" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
-      </ul>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js"></script>
     <script>
-      // --- Локализация и тема ---
-      const translations = {
-        ru: {
-          profile: 'Профиль:',
-          avatar: 'Аватар',
-          change: 'Сменить пароль',
-          upload: 'Загрузить аватар',
-          old: 'Старый пароль',
-          new: 'Новый пароль',
-          confirm: 'Подтвердите новый пароль',
-          changeBtn: 'Сменить пароль',
-          back: 'Назад',
-          theme: 'Тёмная тема',
-          light: 'светлая тема',
-          dark: 'тёмная тема',
-          lang: 'Язык',
-        },
-        en: {
-          profile: 'Profile:',
-          avatar: 'Avatar',
-          change: 'Change password',
-          upload: 'Upload avatar',
-          old: 'Old password',
-          new: 'New password',
-          confirm: 'Confirm new password',
-          changeBtn: 'Change password',
-          back: 'Back',
-          theme: 'Dark theme',
-          light: 'light theme',
-          dark: 'dark theme',
-          lang: 'Language',
-        }
-      };
-      function setTheme(theme) {
-        if (theme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          localStorage.setItem('theme', 'dark');
-          document.getElementById('themeSwitch').checked = true;
-        } else {
-          document.documentElement.setAttribute('data-theme', 'light');
-          localStorage.setItem('theme', 'light');
-          document.getElementById('themeSwitch').checked = false;
-        }
-        updateThemeLabel();
+    window.translations = {
+      ru: {
+        profile: 'Профиль:',
+        avatar: 'Аватар',
+        change: 'Сменить пароль',
+        upload: 'Загрузить аватар',
+        old: 'Старый пароль',
+        new: 'Новый пароль',
+        confirm: 'Подтвердите новый пароль',
+        changeBtn: 'Сменить пароль',
+        back: 'Назад',
+        theme: 'Тёмная тема',
+        light: 'светлая тема',
+        dark: 'тёмная тема',
+        lang: 'Язык',
+      },
+      en: {
+        profile: 'Profile:',
+        avatar: 'Avatar',
+        change: 'Change password',
+        upload: 'Upload avatar',
+        old: 'Old password',
+        new: 'New password',
+        confirm: 'Confirm new password',
+        changeBtn: 'Change password',
+        back: 'Back',
+        theme: 'Dark theme',
+        light: 'light theme',
+        dark: 'dark theme',
+        lang: 'Language',
       }
-      function updateThemeLabel() {
-        const lang = localStorage.getItem('lang') || 'ru';
-        document.getElementById('themeSwitchLabel').textContent = document.getElementById('themeSwitch').checked ? translations[lang].light : translations[lang].dark;
-      }
-      function setLang(lang) {
-        localStorage.setItem('lang', lang);
-        document.getElementById('langLabel').textContent = lang.toUpperCase();
-        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
-        document.querySelector('.card-title').innerHTML = translations[lang].profile + ' {{ username }}';
-        document.getElementById('avatar-tab').textContent = translations[lang].avatar;
-        document.getElementById('password-tab').textContent = translations[lang].change;
-        document.querySelector('button[type="submit"]').textContent = translations[lang].upload;
-        document.querySelector('label[for="old_password"]').textContent = translations[lang].old;
-        document.querySelector('label[for="new_password"]').textContent = translations[lang].new;
-        document.querySelector('label[for="confirm_password"]').textContent = translations[lang].confirm;
-        document.querySelector('#passwordForm button[type="submit"]').textContent = translations[lang].changeBtn;
-        document.querySelector('.mt-3.text-center a').textContent = translations[lang].back;
-        updateThemeLabel();
-      }
-      // --- Синхронизация между вкладками ---
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'theme') setTheme(localStorage.getItem('theme'));
-        if (e.key === 'lang') setLang(localStorage.getItem('lang'));
-      });
-      // --- Инициализация ---
-      setTheme(localStorage.getItem('theme') || 'light');
-      setLang(localStorage.getItem('lang') || 'ru');
-      document.getElementById('themeSwitch').addEventListener('change', function() {
-        setTheme(this.checked ? 'dark' : 'light');
-      });
-      document.querySelectorAll('.lang-option').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.preventDefault();
-          setLang(this.dataset.lang);
-        });
-      });
-      // --- Сохранение состояния вкладок профиля ---
-      document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(btn => {
-        btn.addEventListener('shown.bs.tab', function(e) {
-          localStorage.setItem('profileTab', e.target.id);
-        });
-      });
-      const savedTab = localStorage.getItem('profileTab');
-      if (savedTab) {
-        const tabBtn = document.getElementById(savedTab);
-        if (tabBtn) new bootstrap.Tab(tabBtn).show();
-      }
+    };
+    window.applyPageTranslations = function(lang) {
+      const t = window.translations[lang];
+      document.querySelector('.card-title').innerHTML = t.profile + ' {{ username }}';
+      document.getElementById('avatar-tab').textContent = t.avatar;
+      document.getElementById('password-tab').textContent = t.change;
+      document.querySelector('button[type="submit"]').textContent = t.upload;
+      document.querySelector('label[for="old_password"]').textContent = t.old;
+      document.querySelector('label[for="new_password"]').textContent = t.new;
+      document.querySelector('label[for="confirm_password"]').textContent = t.confirm;
+      document.querySelector('#passwordForm button[type="submit"]').textContent = t.changeBtn;
+      document.querySelector('.mt-3.text-center a').textContent = t.back;
+      document.getElementById('themeSwitchLabelDropdown').textContent = t.theme;
+    };
     </script>
   </body>
 </html> 

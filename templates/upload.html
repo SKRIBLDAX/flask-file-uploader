@@ -122,6 +122,21 @@
                 <li><a class="dropdown-item" href="/"><i class="fa fa-upload me-1"></i>Загрузить</a></li>
                 <li><a class="dropdown-item" href="/profile#password"><i class="fa fa-key me-1"></i>Сменить пароль</a></li>
                 <li><hr class="dropdown-divider"></li>
+                <li class="dropdown-item">
+                  <div class="form-check form-switch d-flex align-items-center mb-2">
+                    <input class="form-check-input me-2" type="checkbox" id="themeSwitchDropdown">
+                    <label class="form-check-label" for="themeSwitchDropdown" id="themeSwitchLabelDropdown">Тёмная тема</label>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle w-100" type="button" id="langDropdownDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      <span id="langFlagDropdown">🇷🇺</span> <span id="langLabelDropdown" class="ms-2">RU</span>
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="langDropdownDropdown">
+                      <li><a class="dropdown-item lang-option-dropdown" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
+                      <li><a class="dropdown-item lang-option-dropdown" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
+                    </ul>
+                  </div>
+                </li>
                 <li><a class="dropdown-item text-danger" href="/logout" id="logoutLink"><i class="fa fa-sign-out-alt me-1"></i>Выйти</a></li>
               </ul>
             </li>
@@ -190,17 +205,8 @@
         </div>
       </div>
     </div>
-    <!-- Переключатель языка в левом нижнем углу -->
-    <div id="langSwitcher" style="position:fixed;left:20px;bottom:20px;z-index:2000;">
-      <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <span id="langFlag">🇷🇺</span> <span id="langLabel" class="ms-2">RU</span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="langDropdown">
-        <li><a class="dropdown-item lang-option" href="#" data-lang="ru"><span class="me-2">🇷🇺</span>Русский</a></li>
-        <li><a class="dropdown-item lang-option" href="#" data-lang="en"><span class="me-2">🇬🇧</span>English</a></li>
-      </ul>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js"></script>
     <script>
       // Автоматически показывать все toasts
       document.querySelectorAll('.toast').forEach(function(toastEl) {
@@ -319,16 +325,16 @@
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
           localStorage.setItem('theme', 'dark');
-          document.getElementById('themeSwitch').checked = true;
-          document.getElementById('themeSwitchLabel').textContent = 'светлый тёма';
+          document.getElementById('themeSwitchDropdown').checked = true;
+          document.getElementById('themeSwitchLabelDropdown').textContent = 'светлый тёма';
         } else {
           document.documentElement.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
-          document.getElementById('themeSwitch').checked = false;
-          document.getElementById('themeSwitchLabel').textContent = 'тёмный тёма';
+          document.getElementById('themeSwitchDropdown').checked = false;
+          document.getElementById('themeSwitchLabelDropdown').textContent = 'тёмный тёма';
         }
       }
-      document.getElementById('themeSwitch').addEventListener('change', function() {
+      document.getElementById('themeSwitchDropdown').addEventListener('change', function() {
         setTheme(this.checked ? 'dark' : 'light');
       });
       // Применить тему при загрузке
@@ -353,7 +359,7 @@
         modal.show();
       });
       // Локализация
-      const translations = {
+      window.translations = {
         ru: {
           upload: 'Загрузить файл',
           drop: 'Перетащите файл сюда или выберите ниже',
@@ -391,32 +397,28 @@
           confirm: 'Logout',
         }
       };
-      function setLang(lang) {
-        localStorage.setItem('lang', lang);
-        document.getElementById('langLabel').textContent = lang.toUpperCase();
-        document.getElementById('langFlag').textContent = lang === 'ru' ? '🇷🇺' : '🇬🇧';
-        document.querySelector('.card-title').textContent = translations[lang].upload;
-        document.getElementById('dropZoneText').textContent = translations[lang].drop;
-        document.querySelector('#uploadForm button[type="submit"]').textContent = translations[lang].select;
-        document.querySelector('.mt-3.text-center a').textContent = translations[lang].files;
-        document.getElementById('themeSwitchLabel').textContent = translations[lang].theme;
-        // dropdown nav
+      window.applyPageTranslations = function(lang) {
+        const t = window.translations[lang];
+        document.querySelector('.card-title').textContent = t.upload;
+        document.getElementById('dropZoneText').textContent = t.drop;
+        document.querySelector('#uploadForm button[type="submit"]').textContent = t.select;
+        document.querySelector('.mt-3.text-center a').textContent = t.files;
+        document.getElementById('themeSwitchLabelDropdown').textContent = t.theme;
         document.querySelectorAll('.nav-link, .dropdown-item').forEach(el => {
-          if (el.href && el.href.endsWith('/profile')) el.innerHTML = `<i class='fa fa-user me-1'></i>${translations[lang].profile}`;
-          if (el.href && el.href.endsWith('/files')) el.innerHTML = `<i class='fa fa-folder-open me-1'></i>${translations[lang].myfiles}`;
-          if (el.href && el.href.endsWith('/')) el.innerHTML = `<i class='fa fa-upload me-1'></i>${translations[lang].uploadnav}`;
-          if (el.id === 'logoutLink') el.innerHTML = `<i class='fa fa-sign-out-alt me-1'></i>${translations[lang].logout}`;
+          if (el.href && el.href.endsWith('/profile')) el.innerHTML = `<i class='fa fa-user me-1'></i>${t.profile}`;
+          if (el.href && el.href.endsWith('/files')) el.innerHTML = `<i class='fa fa-folder-open me-1'></i>${t.myfiles}`;
+          if (el.href && el.href.endsWith('/')) el.innerHTML = `<i class='fa fa-upload me-1'></i>${t.uploadnav}`;
+          if (el.id === 'logoutLink') el.innerHTML = `<i class='fa fa-sign-out-alt me-1'></i>${t.logout}`;
         });
-        // modal
         const modal = document.getElementById('confirmLogoutModal');
         if (modal) {
-          modal.querySelector('.modal-title').textContent = translations[lang].confirmLogout;
-          modal.querySelector('.modal-body').textContent = translations[lang].sureLogout;
-          modal.querySelector('.btn-secondary').textContent = translations[lang].cancel;
-          modal.querySelector('.btn-danger').textContent = translations[lang].confirm;
+          modal.querySelector('.modal-title').textContent = t.confirmLogout;
+          modal.querySelector('.modal-body').textContent = t.sureLogout;
+          modal.querySelector('.btn-secondary').textContent = t.cancel;
+          modal.querySelector('.btn-danger').textContent = t.confirm;
         }
-      }
-      document.querySelectorAll('.lang-option').forEach(el => {
+      };
+      document.querySelectorAll('.lang-option-dropdown').forEach(el => {
         el.addEventListener('click', function(e) {
           e.preventDefault();
           setLang(this.dataset.lang);
