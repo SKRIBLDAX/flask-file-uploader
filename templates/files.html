@@ -170,6 +170,15 @@
                 <label class="form-check-label ms-2" for="themeSwitch" id="themeSwitchLabel">Тёмная тема</label>
               </div>
             </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="langLabel">RU</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                <li><a class="dropdown-item lang-option" href="#" data-lang="ru">Русский</a></li>
+                <li><a class="dropdown-item lang-option" href="#" data-lang="en">English</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -389,6 +398,98 @@
           }
         }
       }
+      // Локализация
+      const translations = {
+        ru: {
+          files: 'Загруженные файлы',
+          total: 'Всего файлов:',
+          search: 'Поиск по файлам...',
+          filename: 'Имя файла',
+          owner: 'Владелец',
+          size: 'Размер',
+          date: 'Дата',
+          actions: 'Действия',
+          download: 'Скачать',
+          del: 'Удалить',
+          theme: 'Тёмная тема',
+          myfiles: 'Мои файлы',
+          uploadnav: 'Загрузка',
+          profile: 'Профиль',
+          logout: 'Выйти',
+          nofiles: 'Нет загруженных файлов',
+          confirmLogout: 'Подтвердите выход',
+          sureLogout: 'Вы уверены, что хотите выйти из аккаунта?',
+          cancel: 'Отмена',
+          confirm: 'Выйти',
+        },
+        en: {
+          files: 'Uploaded files',
+          total: 'Total files:',
+          search: 'Search files...',
+          filename: 'File name',
+          owner: 'Owner',
+          size: 'Size',
+          date: 'Date',
+          actions: 'Actions',
+          download: 'Download',
+          del: 'Delete',
+          theme: 'Dark theme',
+          myfiles: 'My files',
+          uploadnav: 'Upload',
+          profile: 'Profile',
+          logout: 'Logout',
+          nofiles: 'No uploaded files',
+          confirmLogout: 'Confirm logout',
+          sureLogout: 'Are you sure you want to logout?',
+          cancel: 'Cancel',
+          confirm: 'Logout',
+        }
+      };
+      function setLang(lang) {
+        localStorage.setItem('lang', lang);
+        document.getElementById('langLabel').textContent = lang.toUpperCase();
+        document.querySelector('.card-title').textContent = translations[lang].files;
+        document.getElementById('fileCount').previousSibling.textContent = translations[lang].total + ' ';
+        document.getElementById('fileSearch').placeholder = translations[lang].search;
+        // table headers
+        const ths = document.querySelectorAll('#filesTable th');
+        if (ths.length >= 5) {
+          ths[0].innerHTML = translations[lang].filename + ' <i class="fa fa-sort"></i>';
+          ths[1].innerHTML = translations[lang].owner + ' <i class="fa fa-sort"></i>';
+          ths[2].innerHTML = translations[lang].size + ' <i class="fa fa-sort"></i>';
+          ths[3].innerHTML = translations[lang].date + ' <i class="fa fa-sort"></i>';
+          ths[4].textContent = translations[lang].actions;
+        }
+        // table actions
+        document.querySelectorAll('.btn-purple').forEach(btn => btn.textContent = translations[lang].download);
+        document.querySelectorAll('.btn-delete').forEach(btn => btn.textContent = translations[lang].del);
+        document.getElementById('themeSwitchLabel').textContent = translations[lang].theme;
+        // nav
+        document.querySelectorAll('.nav-link, .dropdown-item').forEach(el => {
+          if (el.href && el.href.endsWith('/profile')) el.innerHTML = `<i class='fa fa-user me-1'></i>${translations[lang].profile}`;
+          if (el.href && el.href.endsWith('/files')) el.innerHTML = `<i class='fa fa-folder-open me-1'></i>${translations[lang].myfiles}`;
+          if (el.href && el.href.endsWith('/')) el.innerHTML = `<i class='fa fa-upload me-1'></i>${translations[lang].uploadnav}`;
+          if (el.id === 'logoutLink') el.innerHTML = `<i class='fa fa-sign-out-alt me-1'></i>${translations[lang].logout}`;
+        });
+        // modal
+        const modal = document.getElementById('confirmLogoutModal');
+        if (modal) {
+          modal.querySelector('.modal-title').textContent = translations[lang].confirmLogout;
+          modal.querySelector('.modal-body').textContent = translations[lang].sureLogout;
+          modal.querySelector('.btn-secondary').textContent = translations[lang].cancel;
+          modal.querySelector('.btn-danger').textContent = translations[lang].confirm;
+        }
+        // no files
+        const nofiles = document.querySelector('.alert-warning.text-center');
+        if (nofiles) nofiles.textContent = translations[lang].nofiles;
+      }
+      document.querySelectorAll('.lang-option').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          setLang(this.dataset.lang);
+        });
+      });
+      setLang(localStorage.getItem('lang') || 'ru');
     </script>
   </body>
 </html> 
